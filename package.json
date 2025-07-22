@@ -1,0 +1,11 @@
+{
+  "name": "simple-db",
+  "version": "1.0.0",
+  "description": "A simple file-based database in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
