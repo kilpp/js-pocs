@@ -1,74 +1,76 @@
-// import { prince } from "princejs";
-// import { cors, logger } from "princejs/middleware";
-
-// const app = prince();
-
-// app.use(cors());
-// app.use(logger({ format: "dev" }));
-
-// app.ws("/chat", {
-//   open: (ws) => {
-//     ws.send("Welcome to the chat!");
-//   },
-//   message: (ws, msg) => {
-//     ws.send(`Echo: ${msg}`);
-//   },
-//   close: () => {
-//     console.log("User disconnected");
-//   }
-// });
-
+import { prince } from "princejs";
+import { cors, logger } from "princejs/middleware";
 import { randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 
-const sseEvents = new EventEmitter();
+const app = prince();
 
-export const sse = (data) => {
-  sseEvents.setMaxListeners(10000)
-  sseEvents.emit(
-    "sse",
-    `id: ${randomUUID()}\ndata: ${JSON.stringify(data)}\n\n`
-  );
+app.use(cors());
+app.use(logger({ format: "dev" }));
+
+// SSE event emitter setup
+const sseEvents = new EventEmitter();
+sseEvents.setMaxListeners(250000);
+
+export const broadcast = (data) => {
+  const message = `id: ${randomUUID()}\ndata: ${JSON.stringify(data)}\n\n`;
+  sseEvents.emit("sse", message);
 };
 
+// Demo: broadcast events every 2 seconds
 let counter = 0;
 setInterval(() => {
-  sse({ payload: { date: Date.now(), times: counter++ } });
+  broadcast({ payload: { date: Date.now(), times: counter++ } });
 }, 2000);
 
-export default {
-  port: 3000,
-  async fetch(req) {
-    const stream = new ReadableStream({
-      start(controller) {
-        sseEvents.once("sse", () => {
-          controller.enqueue(`retry: 3000\n\n`);
-        });
-      },
-      pull(controller) {
-        sseEvents.on("sse", (data) => {
-          const queue = [Buffer.from(data)];
-          const chunk = queue.shift();
-          controller.enqueue(chunk);
-        });
-      },
-      cancel(controller) {
-        sseEvents.removeAllListeners("sse");
-        controller.close();
-      },
-    });
+// SSE endpoint
+app.get("/events", (req) => {
+  return app
+    .response()
+    .status(200)
+    .header("Content-Type", "text/event-stream;charset=utf-8")
+    .header("Cache-Control", "no-cache, no-transform")
+    .header("Connection", "keep-alive")
+    .header("X-Accel-Buffering", "no")
+    .stream((push, close) => {
+      // Send initial retry configuration
+      push("retry: 3000\n\n");
 
-    return new Response(stream, {
-      status: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "text/event-stream;charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
-        "Connection": "keep-alive",
-        "X-Accel-Buffering": "no",
-      },
+      // Listen for SSE events and push to client
+      const handler = (message) => {
+        push(message);
+      };
+
+      sseEvents.on("sse", handler);
+
+      // Clean up on connection close
+      req.signal?.addEventListener("abort", () => {
+        sseEvents.off("sse", handler);
+        close();
+      });
     });
+});
+
+// WebSocket endpoint
+app.ws("/chat", {
+  open: (ws) => {
+    ws.send("Welcome to the chat!");
   },
-}
+  message: (ws, msg) => {
+    ws.send(`Echo: ${msg}`);
+  },
+  close: () => {
+    console.log("User disconnected from chat");
+  }
+});
 
-// app.listen(3000);
+// Basic route
+app.get("/", () => ({ 
+  message: "Hello!",
+  endpoints: {
+    sse: "/events",
+    websocket: "/chat"
+  }
+}));
+
+app.listen(3000);
