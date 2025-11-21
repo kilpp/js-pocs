@@ -33,9 +33,6 @@ app.get("/events", (req) => {
     .header("Connection", "keep-alive")
     .header("X-Accel-Buffering", "no")
     .stream((push, close) => {
-      // Send initial retry configuration
-      push("retry: 3000\n\n");
-
       // Listen for SSE events and push to client
       const handler = (message) => {
         push(message);
