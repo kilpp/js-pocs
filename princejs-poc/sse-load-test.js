@@ -19,7 +19,7 @@ export const options = {
         { duration: "2m", target: 1000 },   // Ramp up to 1k users
         { duration: "2m", target: 5000 },   // Ramp up to 5k users
         { duration: "2m", target: 10000 },  // Ramp up to 10k users
-        { duration: "5m", target: 10000 },  // Stay at 10k for 5 minutes
+        { duration: "5m", target: 50000 },  // Stay at 10k for 5 minutes
         { duration: "2m", target: 0 },      // Ramp down
       ],
       gracefulRampDown: "30s",
