@@ -5,6 +5,7 @@
     "": {
       "name": "princejs-poc",
       "dependencies": {
+        "kafkajs": "^2.2.4",
         "princejs": "^1.6.6",
       },
       "devDependencies": {
@@ -25,6 +26,8 @@
     "bun-types": ["bun-types@1.3.2", "", { "dependencies": { "@types/node": "*" }, "peerDependencies": { "@types/react": "^19" } }, "sha512-i/Gln4tbzKNuxP70OWhJRZz1MRfvqExowP7U6JKoI8cntFrtxg7RJK3jvz7wQW54UuvNC8tbKHHri5fy74FVqg=="],
 
     "csstype": ["csstype@3.2.3", "", {}, "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ=="],
+
+    "kafkajs": ["kafkajs@2.2.4", "", {}, "sha512-j/YeapB1vfPT2iOIUn/vxdyKEuhuY2PxMBvf5JWux6iSaukAccrMtXEY/Lb7OvavDhOWME589bpLrEdnVHjfjA=="],
 
     "princejs": ["princejs@1.6.6", "", { "peerDependencies": { "zod": "^4.1.12" }, "optionalPeers": ["zod"], "bin": { "create-princejs": "dist/create.js" } }, "sha512-KtP6yvdBOw8+DAVi3ZucWoq96RWGKIpxqk0rO8tZXXw8hdTja6QdOTRoirRRVB2nLM3vVEd0ixKHlGCJHXfi7A=="],
 

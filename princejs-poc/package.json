@@ -9,6 +9,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "kafkajs": "^2.2.4",
     "princejs": "^1.6.6"
   }
 }
